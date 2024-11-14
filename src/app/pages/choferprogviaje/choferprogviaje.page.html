@@ -3,6 +3,7 @@
     <h4>Programa tu viaje</h4>
   </div>
 
+  <!-- Selección del Origen -->
   <ion-item>
     <ion-label>Origen</ion-label>
     <ion-select value="duoc" disabled>
@@ -10,6 +11,7 @@
     </ion-select>
   </ion-item>
 
+  <!-- Selección de Asientos -->
   <ion-list>
     <ion-item>
       <ion-label>Asientos<ion-text color="danger">(Obligatorio)</ion-text></ion-label>
@@ -24,7 +26,7 @@
     </ion-item>
   </ion-list>
 
-  <!-- Campos de información del conductor -->
+  <!-- Campos de Información del Conductor -->
   <ion-item>
     <ion-label position="floating">Patente del Vehículo</ion-label>
     <ion-input [(ngModel)]="patente" placeholder="ABC123" required></ion-input>
@@ -40,19 +42,24 @@
     <ion-input [(ngModel)]="numeroContacto" placeholder="+56912345678" required></ion-input>
   </ion-item>
 
-  <!-- Contenedor del mapa -->
+  <!-- Contenedor del Mapa -->
   <div id="map" style="height: 300px;"></div>
 
-  <!-- Sección para mostrar el destino seleccionado -->
+  <!-- Sección para mostrar el Destino Seleccionado -->
   <div *ngIf="destinationName" class="destination">
     <ion-label>Destino: {{ destinationName }}</ion-label>
   </div>
 
+  <!-- Campo para el Precio -->
   <ion-item>
     <ion-label>Precio:</ion-label>
     <ion-input type="number" [(ngModel)]="precio" placeholder="0"></ion-input>
   </ion-item>
 
+  <!-- Botón para Programar Viaje -->
   <ion-button (click)="programarViaje()" shape="round" expand="block">Siguiente</ion-button>
+
+  <!-- Botón para Volver -->
   <ion-button routerLink="/choferben" color="tertiary" shape="round" expand="block">Volver</ion-button>
+
 </ion-content>

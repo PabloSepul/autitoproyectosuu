@@ -17,9 +17,9 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
   destinationName: string = '';
   asientos: number = 3;
   precio: number = 4000;
-  patente: string = '';  // Campo para la patente del vehículo
-  nombreConductor: string = '';  // Campo para el nombre del conductor
-  numeroContacto: string = '';  // Campo para el número de contacto
+  patente: string = '';
+  nombreConductor: string = '';
+  numeroContacto: string = '';
   readonly startingPoint = new mapboxgl.LngLat(-73.0625728, -36.795331);
   userId: string | undefined;
 
@@ -36,7 +36,7 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
-        this.cargarPerfilUsuario(); // Cargar el perfil del usuario al iniciar
+        this.cargarPerfilUsuario();
       } else {
         this.router.navigate(['/home']);
       }
@@ -117,12 +117,12 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
       origen: 'Duoc UC - Concepción',
       destino: this.destinationName,
       asientos: this.asientos,
-      asientosDisponibles: this.asientos,
+      asientosDisponibles: this.asientos - 1,  // Reducir un asiento ya que el conductor es pasajero
       precio: this.precio,
       patente: this.patente,
       nombreConductor: this.nombreConductor,
       numeroContacto: this.numeroContacto,
-      pasajeros: []
+      pasajeros: [this.userId]  // Añadir al conductor como pasajero
     };
 
     try {
