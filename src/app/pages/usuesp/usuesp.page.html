@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Viaje en progreso</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Información del viaje</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Conductora:</strong> Rocio</p>
+      <p><strong>Patente del Vehículo:</strong> ABC123</p>
+      <p><strong>Hora estimada de llegada:</strong> {{ estimadoLlegada }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" color="primary" (click)="confirmarFinViaje()">
+    Finalizar viaje
+  </ion-button>
+</ion-content>

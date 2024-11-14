@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Viajes en Curso</ion-title>
+    <ion-button slot="end" (click)="actualizarViajes()">Actualizar Viajes</ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list *ngIf="viajes.length > 0; else noViajes">
+    <ion-item *ngFor="let viaje of viajes">
+      <ion-label>
+        <h2>Origen: {{ viaje.origen }}</h2>
+        <p>Destino: {{ viaje.destino }}</p>
+        <p>Asientos Disponibles: {{ viaje.asientosDisponibles }}</p>
+        <p>Precio: ${{ viaje.precio }}</p>
+      </ion-label>
+      <ion-button color="primary" (click)="confirmarUnirseAViaje(viaje.id)" [disabled]="viaje.asientosDisponibles === 0">
+        Unirse
+      </ion-button>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="block" color="secondary" (click)="actualizarViajes()">
+    Actualizar Todos los Viajes
+  </ion-button>
+
+  <ng-template #noViajes>
+    <ion-text color="medium" class="ion-text-center">
+      <h2>No hay viajes disponibles en este momento</h2>
+    </ion-text>
+  </ng-template>
+</ion-content>

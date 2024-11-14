@@ -1,0 +1,42 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="text-center">
+    <h4>Programa tu viaje</h4>
+  </div>
+
+  <ion-item>
+    <ion-label>Origen</ion-label>
+    <ion-select value="duoc" disabled>
+      <ion-select-option value="duoc">Duoc UC - Concepción</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Asientos<ion-text color="danger">(Obligatorio)</ion-text></ion-label>
+      <ion-select placeholder="Asientos disponibles" interface="action-sheet" [(ngModel)]="asientos">
+        <ion-select-option value="1">1</ion-select-option>
+        <ion-select-option value="2">2</ion-select-option>
+        <ion-select-option value="3">3</ion-select-option>
+        <ion-select-option value="4">4</ion-select-option>
+        <ion-select-option value="5">5</ion-select-option>
+        <ion-select-option value="6">6</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <!-- Contenedor del mapa -->
+  <div id="map" style="height: 300px;"></div>
+
+  <!-- Sección para mostrar el destino seleccionado -->
+  <div *ngIf="destinationName" class="destination">
+    <ion-label>Destino: {{ destinationName }}</ion-label>
+  </div>
+
+  <ion-item>
+    <ion-label>Precio:</ion-label>
+    <ion-input type="number" [(ngModel)]="precio" placeholder="0"></ion-input>
+  </ion-item>
+
+  <ion-button (click)="programarViaje()" shape="round" expand="block">Siguiente</ion-button>
+  <ion-button routerLink="/choferben" color="tertiary" shape="round" expand="block">Volver</ion-button>
+</ion-content>

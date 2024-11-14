@@ -1,0 +1,32 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      TeLlevoApp
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="text-center">
+    <h4>Resumen de tu viaje</h4>
+  </div>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Detalles del Viaje</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Origen:</strong> {{ travelData?.origen }}</p>
+      <p><strong>Destino:</strong> {{ travelData?.destino }}</p>
+      <p><strong>Asientos:</strong> {{ travelData?.asientos }}</p>
+      <p><strong>Precio:</strong> ${{ travelData?.precio }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button routerLink="/choferprogviaje" shape="round" expand="full">Editar</ion-button>
+  <ion-button routerLink="/chofespera" shape="round" expand="full">Confirmar</ion-button>
+
+  <ion-toolbar>
+    <ion-title size="large"></ion-title>
+  </ion-toolbar>
+</ion-content>

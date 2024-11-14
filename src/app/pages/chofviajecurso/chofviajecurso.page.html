@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalles del Viaje</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>Información del Viaje</h2>
+  <p><strong>Origen:</strong> {{ origen }}</p>
+  <p><strong>Destino:</strong> {{ destino }}</p>
+  <p><strong>Asientos aun disponibles:</strong> {{ asientosTotales }}</p>
+  <p><strong>Pasajeros Confirmados:</strong> {{ pasajeros.length }}</p>
+
+  <ion-item *ngIf="fechaViaje">
+    <ion-label>
+      Fecha del viaje: {{ fechaViaje | date: 'short' }}
+    </ion-label>
+  </ion-item>
+
+  <!-- Botón para finalizar el viaje -->
+  <ion-button color="primary" expand="block" (click)="finalizarViaje()">Finalizar Viaje</ion-button>
+</ion-content>

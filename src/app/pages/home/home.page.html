@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Iniciar Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-text class="ion-padding ion-text-center">
+    <h2>Bienvenido</h2>
+  </ion-text>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Iniciar Sesión</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form (ngSubmit)="login()">
+        <ion-item>
+          <ion-label position="floating">Correo Electrónico</ion-label>
+          <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
+        </ion-item>
+        
+        <ion-button expand="block" type="submit" [disabled]="!email || !password">
+          Iniciar Sesión
+        </ion-button>
+      </form>
+      <ion-router-link routerLink="/register" color="primary">¿No tienes cuenta? Regístrate</ion-router-link>
+      <ion-router-link routerLink="/recuperar" color="primary">¿Olvidaste tu contraseña?</ion-router-link>
+    </ion-card-content>
+  </ion-card>
+  <ion-img src="assets/img/autito3.png"></ion-img>
+</ion-content>

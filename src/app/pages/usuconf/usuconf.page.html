@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfil del Conductor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Conductor: {{ conductor.nombre }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-avatar class="ion-margin-bottom">
+        <img [src]="conductor.foto" alt="Foto del conductor">
+      </ion-avatar>
+
+      <p><strong>Patente del vehículo:</strong> {{ conductor.patente }}</p>
+      <p><strong>Rocio se encuentra en:</strong> Estacionamiento DuocUC</p>
+
+      <p><strong>Hora máxima de llegada:</strong> {{ tiempoRestante }}</p>
+
+      <ion-button expand="block" color="success" (click)="confirmarViaje('Jaime')">
+        Llegué
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

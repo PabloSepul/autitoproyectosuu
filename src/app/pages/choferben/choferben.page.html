@@ -1,0 +1,27 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Seleccionar Perfil
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="6" class="ion-text-center">
+        <ion-img src="assets/img/conductor.png" alt="Imagen de Conductor"></ion-img>
+        <ion-button routerLink="/choferprogviaje" expand="block" color="primary">Conductor</ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="6" class="ion-text-center">
+        <ion-img src="assets/img/pasajero.png" alt="Imagen de Pasajero"></ion-img>
+        <ion-button routerLink="/usuplan" expand="block" color="secondary">Pasajero</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

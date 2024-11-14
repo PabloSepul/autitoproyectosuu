@@ -1,0 +1,13 @@
+#map-container {
+    width: 100%;
+    height: 400px; /* Altura fija para evitar problemas de visualización */
+    position: relative;
+  }
+  
+  #map {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  

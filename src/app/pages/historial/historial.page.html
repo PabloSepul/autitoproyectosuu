@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Historial de Viajes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Lista de viajes si existen registros -->
+  <ion-list *ngIf="historial.length > 0; else noHistorial">
+    <ion-item *ngFor="let viaje of historial">
+      <ion-label>
+        <h2>Origen: {{ viaje.origen || 'N/A' }}</h2>
+        <p>Destino: {{ viaje.destino || 'N/A' }}</p>
+        <!-- Mostrar fecha como cadena de texto -->
+        <p>Fecha: {{ viaje.fecha }}</p>
+        <p>Pasajeros: {{ viaje.pasajeros?.length || 0 }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Plantilla alternativa si no hay historial -->
+  <ng-template #noHistorial>
+    <div class="ion-text-center">
+      <ion-text color="medium">
+        <h2>No hay viajes registrados en el historial</h2>
+      </ion-text>
+    </div>
+  </ng-template>
+</ion-content>

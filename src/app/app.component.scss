@@ -1,0 +1,17 @@
+ion-app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  ion-router-outlet {
+    flex-grow: 1;
+  }
+  
+  ion-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 10;
+  }
+  

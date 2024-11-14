@@ -1,0 +1,34 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Confirmar Código</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Ingresa el Código de 6 Dígitos</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form [formGroup]="codigoForm" (ngSubmit)="onConfirmar()">
+        <ion-item>
+          <ion-label position="floating">Código</ion-label>
+          <ion-input type="number" formControlName="codigo" inputmode="numeric" required></ion-input>
+        </ion-item>
+
+        <ion-text color="danger" *ngIf="codigoForm.get('codigo')?.invalid && codigoForm.get('codigo')?.touched">
+          El código debe tener exactamente 6 dígitos.
+        </ion-text>
+
+        <ion-button expand="block" type="submit" [disabled]="codigoForm.invalid">
+          Confirmar
+        </ion-button>
+        <ion-button routerLink="/recuperar" expand="block" fill="clear">
+          Volver atras
+        </ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+

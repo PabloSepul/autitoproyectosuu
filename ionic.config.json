@@ -1,0 +1,7 @@
+{
+  "name": "autitoproyecto",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
