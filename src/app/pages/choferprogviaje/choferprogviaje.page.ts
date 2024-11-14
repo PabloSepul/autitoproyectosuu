@@ -36,6 +36,7 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
+        this.loadUserProfile(); // Cargar el perfil del usuario al iniciar
       } else {
         this.router.navigate(['/home']);
       }
@@ -92,6 +93,18 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
       });
   }
 
+  private loadUserProfile() {
+    if (this.userId) {
+      this.firestore.doc(`usuarios/${this.userId}/perfil`).valueChanges().subscribe((profile: any) => {
+        if (profile) {
+          this.patente = profile.patente || '';
+          this.nombreConductor = profile.nombreConductor || '';
+          this.numeroContacto = profile.numeroContacto || '';
+        }
+      });
+    }
+  }
+
   async programarViaje() {
     if (!this.destination || !this.userId || !this.patente || !this.nombreConductor || !this.numeroContacto) {
       alert('Por favor, completa toda la información y selecciona un destino en el mapa.');
@@ -111,7 +124,16 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
     };
 
     try {
+      // Guardar los datos del viaje en Firestore
       await this.viajeService.guardarViaje(this.userId, viajeData);
+
+      // Guardar la información del conductor en el perfil del usuario, si no está guardada
+      await this.firestore.collection('usuarios').doc(this.userId).collection('perfil').doc('datos').set({
+        patente: this.patente,
+        nombreConductor: this.nombreConductor,
+        numeroContacto: this.numeroContacto
+      }, { merge: true }); // `merge: true` asegura que solo se actualicen estos campos y no se sobreescriba el documento
+
       this.router.navigate(['/choferprogconfirmar']);
     } catch (error) {
       alert('Error al guardar el viaje. Inténtalo de nuevo.');
