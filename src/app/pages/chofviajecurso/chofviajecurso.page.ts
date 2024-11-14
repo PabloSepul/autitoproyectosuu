@@ -15,9 +15,14 @@ export class ChofviajecursoPage implements OnInit {
   viaje$: Observable<any> | undefined;
   origen: string = '';
   destino: string = '';
-  asientosTotales: number = 0;  // Cambiado de `asientos` a `asientosTotales`
+  asientosTotales: number = 0;
   pasajeros: any[] = [];
   fechaViaje: string | undefined;
+
+  // Información del conductor
+  nombreConductor: string = '';
+  patente: string = '';
+  numeroContacto: string = '';
 
   constructor(
     private firestore: AngularFirestore,
@@ -46,10 +51,16 @@ export class ChofviajecursoPage implements OnInit {
           if (viajeData) {
             this.origen = typeof viajeData['origen'] === 'string' ? viajeData['origen'] : '';
             this.destino = typeof viajeData['destino'] === 'string' ? viajeData['destino'] : '';
-            this.asientosTotales = typeof viajeData['asientosDisponibles'] === 'number' ? viajeData['asientosDisponibles'] : 0;  // Cambiado a `asientosDisponibles`
+            this.asientosTotales = typeof viajeData['asientosDisponibles'] === 'number' ? viajeData['asientosDisponibles'] : 0;
             this.pasajeros = Array.isArray(viajeData['pasajeros']) ? viajeData['pasajeros'] : [];
             this.fechaViaje = typeof viajeData['fecha'] === 'string' ? viajeData['fecha'] : '';
-            console.log('Datos del viaje cargados:', this.origen, this.destino, this.asientosTotales, this.pasajeros, this.fechaViaje);
+
+            // Cargar la información del conductor
+            this.nombreConductor = typeof viajeData['nombreConductor'] === 'string' ? viajeData['nombreConductor'] : '';
+            this.patente = typeof viajeData['patente'] === 'string' ? viajeData['patente'] : '';
+            this.numeroContacto = typeof viajeData['numeroContacto'] === 'string' ? viajeData['numeroContacto'] : '';
+
+            console.log('Datos del viaje cargados:', this.origen, this.destino, this.asientosTotales, this.pasajeros, this.fechaViaje, this.nombreConductor, this.patente, this.numeroContacto);
           } else {
             console.warn('No se encontraron datos para el viaje.');
           }
@@ -101,6 +112,9 @@ export class ChofviajecursoPage implements OnInit {
         asientosTotales: this.asientosTotales,
         pasajeros: this.pasajeros,
         fecha: fechaActual,
+        nombreConductor: this.nombreConductor,
+        patente: this.patente,
+        numeroContacto: this.numeroContacto
       };
 
       historialRef.add(viajeFinalizado)
