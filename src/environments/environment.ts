@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+  production: true,
   mapboxKey: 'pk.eyJ1IjoicGFibG9zZXB1IiwiYSI6ImNtMzZldWl6ZTA0czkya3B3OGs0aDE3YmQifQ.YXM8X_w-1u01fLhZBndGZQ',
   firebaseConfig: {
     apiKey: "AIzaSyAgjAWo5ucggysTc-iOcX45iSno5VJcteE",
