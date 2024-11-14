@@ -10,6 +10,9 @@
     <ion-item *ngFor="let viaje of viajes">
       <ion-label>
         <h2>Origen: {{ viaje.origen }}</h2>
+        <p>Nombre del Conductor: {{ viaje.nombreConductor }}</p>
+        <p>Patente del Vehículo: {{ viaje.patente }}</p>
+        <p>Número de Contacto: {{ viaje.numeroContacto }}</p>
         <p>Destino: {{ viaje.destino }}</p>
         <p>Asientos Disponibles: {{ viaje.asientosDisponibles }}</p>
         <p>Precio: ${{ viaje.precio }}</p>

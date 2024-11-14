@@ -17,6 +17,9 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
   destinationName: string = '';
   asientos: number = 3;
   precio: number = 4000;
+  patente: string = '';  // Campo para la patente del vehículo
+  nombreConductor: string = '';  // Campo para el nombre del conductor
+  numeroContacto: string = '';  // Campo para el número de contacto
   readonly startingPoint = new mapboxgl.LngLat(-73.0625728, -36.795331);
   userId: string | undefined;
 
@@ -33,7 +36,6 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
-        console.log('Usuario autenticado con ID:', this.userId);
       } else {
         this.router.navigate(['/home']);
       }
@@ -90,31 +92,29 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
       });
   }
 
-// choferprogviaje.page.ts
+  async programarViaje() {
+    if (!this.destination || !this.userId || !this.patente || !this.nombreConductor || !this.numeroContacto) {
+      alert('Por favor, completa toda la información y selecciona un destino en el mapa.');
+      return;
+    }
 
-async programarViaje() {
-  if (!this.destination || !this.userId) {
-    alert('Por favor, selecciona un destino en el mapa y asegúrate de estar autenticado.');
-    return;
+    const viajeData = {
+      origen: 'Duoc UC - Concepción',
+      destino: this.destinationName,
+      asientos: this.asientos,
+      asientosDisponibles: this.asientos,
+      precio: this.precio,
+      patente: this.patente,
+      nombreConductor: this.nombreConductor,
+      numeroContacto: this.numeroContacto,
+      pasajeros: []
+    };
+
+    try {
+      await this.viajeService.guardarViaje(this.userId, viajeData);
+      this.router.navigate(['/choferprogconfirmar']);
+    } catch (error) {
+      alert('Error al guardar el viaje. Inténtalo de nuevo.');
+    }
   }
-
-  const viajeData = {
-    origen: 'Duoc UC - Concepción',
-    destino: this.destinationName,
-    asientos: this.asientos,
-    asientosDisponibles: this.asientos,
-    precio: this.precio,
-    pasajeros: []
-  };
-
-  console.log('Guardando viaje para usuario con ID:', this.userId);
-
-  try {
-    await this.viajeService.guardarViaje(this.userId, viajeData);
-    this.router.navigate(['/choferprogconfirmar']);
-  } catch (error) {
-    alert('Error al guardar el viaje. Inténtalo de nuevo.');
-  }
-}
-
 }
