@@ -18,11 +18,11 @@ export class HomePage {
     this.authService.login(this.email, this.password)
       .then(() => {
         console.log('Inicio de sesión exitoso');
-        this.router.navigate(['/choferben']); // Redirige a la página principal del usuario
+        this.router.navigate(['/choferben']); 
       })
       .catch(error => {
         console.error('Error en inicio de sesión:', error);
-        this.presentAlert('Usuario o contraseña incorrectos.'); // Muestra la alerta
+        this.presentAlert('Usuario o contraseña incorrectos.'); 
       });
   }
   

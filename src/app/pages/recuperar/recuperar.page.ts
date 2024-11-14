@@ -16,7 +16,7 @@ export class RecuperarPage {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private alertController: AlertController,
-    private router: Router  // Inyecta el Router aquí
+    private router: Router 
   ) {
     this.recuperarForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
@@ -36,16 +36,14 @@ export class RecuperarPage {
     if (this.recuperarForm.valid) {
       const email = this.recuperarForm.value.email;
 
-      // Llama al servicio para enviar el correo de restablecimiento de contraseña
+
       this.authService.sendPasswordResetEmail(email)
         .then(() => {
-          // Muestra una alerta confirmando el envío del correo
           this.presentAlert(
             'Correo enviado',
             'Hemos enviado un enlace de recuperación de contraseña a tu correo electrónico.'
           );
 
-          // Redirige a la página Home después de enviar el correo
           this.router.navigate(['/home']);
         })
         .catch(error => {

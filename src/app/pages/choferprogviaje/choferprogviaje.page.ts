@@ -117,16 +117,15 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
       origen: 'Duoc UC - Concepción',
       destino: this.destinationName,
       asientos: this.asientos,
-      asientosDisponibles: this.asientos - 1,  // Reducir un asiento ya que el conductor es pasajero
+      asientosDisponibles: this.asientos - 1,
       precio: this.precio,
       patente: this.patente,
       nombreConductor: this.nombreConductor,
       numeroContacto: this.numeroContacto,
-      pasajeros: [this.userId]  // Añadir al conductor como pasajero
+      pasajeros: [this.userId] 
     };
 
     try {
-      // Guardar los datos del viaje en Firestore
       await this.viajeService.guardarViaje(this.userId, viajeData);
 
       this.router.navigate(['/choferprogconfirmar']);

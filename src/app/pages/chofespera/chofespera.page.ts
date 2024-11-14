@@ -70,7 +70,7 @@ export class ChofesperaPage implements OnInit {
         {
           text: 'Sí',
           handler: () => {
-            this.cancelarViaje(); // Llama a cancelar el viaje si se confirma
+            this.cancelarViaje(); 
           }
         }
       ]
@@ -86,7 +86,7 @@ export class ChofesperaPage implements OnInit {
         .delete()
         .then(() => {
           console.log('Viaje cancelado correctamente');
-          this.router.navigate(['/choferben']); // Redirige al menú principal
+          this.router.navigate(['/choferben']); 
         })
         .catch(error => {
           console.error('Error al cancelar el viaje:', error);

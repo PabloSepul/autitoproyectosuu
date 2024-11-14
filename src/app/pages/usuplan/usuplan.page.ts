@@ -21,24 +21,21 @@ export class UsuplanPage implements OnInit {
   ) {}
   
   ngOnInit() {
-    // Verificación de autenticación
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
       } else {
         console.warn('Usuario no autenticado. Redirigiendo al inicio de sesión.');
-        this.router.navigate(['/home']); // Redirige al inicio de sesión si no está autenticado
+        this.router.navigate(['/home']); 
       }
     });
   }
 
   ionViewWillEnter() {
-    // Carga los viajes cada vez que el usuario entra a la vista
     this.obtenerViajes();
   }
 
   obtenerViajes() {
-    // Lógica para obtener viajes en curso en tiempo real
     this.firestore.collectionGroup('viajes', ref => ref.where('asientosDisponibles', '>', 0))
       .snapshotChanges()
       .subscribe(snapshot => {

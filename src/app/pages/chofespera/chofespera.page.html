@@ -10,19 +10,16 @@
 
     <ion-icon name="sync-outline" class="girar"></ion-icon>
 
-    <!-- Resumen del viaje -->
     <p><strong>Origen:</strong> {{ origen }}</p>
     <p><strong>Destino:</strong> {{ destino }}</p>
     <p><strong>Asientos Totales:</strong> {{ asientos }}</p>
     <p><strong>Asientos Disponibles:</strong> {{ asientosDisponibles }}</p>
     <p><strong>Precio:</strong> ${{ precio }}</p>
 
-    <!-- Botón para comenzar el viaje, se habilita solo si hay pasajeros -->
     <ion-button [disabled]="asientosDisponibles === asientos" routerLink="/chofviajecurso" expand="block" class="button">
       COMENZAR VIAJE
     </ion-button>
 
-    <!-- Botón para cancelar el viaje -->
     <ion-button color="danger" (click)="confirmarCancelacion()" expand="block" class="button">
       CANCELAR VIAJE
     </ion-button>    

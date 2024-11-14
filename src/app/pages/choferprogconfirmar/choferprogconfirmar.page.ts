@@ -7,12 +7,11 @@ import { ViajeService } from '../../services/viaje.service';
   styleUrls: ['./choferprogconfirmar.page.scss'],
 })
 export class ChoferprogconfirmarPage implements OnInit {
-  travelData: any; // Declaramos travelData para almacenar los datos del viaje
+  travelData: any;
 
   constructor(private viajeService: ViajeService) {}
 
   ngOnInit() {
-    // Obtenemos los datos del viaje del servicio y los asignamos a travelData
     this.viajeService.obtenerViaje().subscribe(data => {
       if (data) {
         this.travelData = data;

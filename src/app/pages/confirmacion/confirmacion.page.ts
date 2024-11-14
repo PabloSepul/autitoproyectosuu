@@ -32,7 +32,6 @@ export class ConfirmacionPage {
 
   onConfirmar() {
     if (this.codigoForm.valid) {
-      // Aquí debes comparar el código ingresado con el código enviado por correo
       console.log('Código verificado correctamente');
       this.router.navigate(['/restablecer']);
     } else {

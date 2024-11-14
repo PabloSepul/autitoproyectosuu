@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireAuthModule, PERSISTENCE} from '@angular/fire/compat/auth';  // Asegúrate de que esté importado
+import { AngularFireAuthModule, PERSISTENCE} from '@angular/fire/compat/auth'; 
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -18,7 +18,7 @@ import { environment } from '../environments/environment';
     IonicModule.forRoot(),
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFireAuthModule,  // Agrega esta línea para incluir el módulo de autenticación
+    AngularFireAuthModule, 
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

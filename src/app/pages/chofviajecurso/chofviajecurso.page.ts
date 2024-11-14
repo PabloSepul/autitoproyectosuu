@@ -19,7 +19,6 @@ export class ChofviajecursoPage implements OnInit {
   pasajeros: any[] = [];
   fechaViaje: string | undefined;
 
-  // Información del conductor
   nombreConductor: string = '';
   patente: string = '';
   numeroContacto: string = '';
@@ -55,7 +54,6 @@ export class ChofviajecursoPage implements OnInit {
             this.pasajeros = Array.isArray(viajeData['pasajeros']) ? viajeData['pasajeros'] : [];
             this.fechaViaje = typeof viajeData['fecha'] === 'string' ? viajeData['fecha'] : '';
 
-            // Cargar la información del conductor
             this.nombreConductor = typeof viajeData['nombreConductor'] === 'string' ? viajeData['nombreConductor'] : '';
             this.patente = typeof viajeData['patente'] === 'string' ? viajeData['patente'] : '';
             this.numeroContacto = typeof viajeData['numeroContacto'] === 'string' ? viajeData['numeroContacto'] : '';
