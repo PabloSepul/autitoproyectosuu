@@ -1,22 +1,39 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Perfil</ion-title>
+    <ion-title>Perfil del Conductor</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
+  <h2>Información del Perfil</h2>
 
-  <div class="profile-container">
-    <ion-avatar class="profile-avatar">
-      <img src="assets/img/rocio.png" alt="Foto de perfil">
-    </ion-avatar>
-    <h2>Ingeniería en Informática</h2>
-  </div>
+  <!-- Nombre del Conductor -->
+  <ion-item>
+    <ion-label position="floating">Nombre del Conductor</ion-label>
+    <ion-input [readonly]="!editMode.nombre" [(ngModel)]="nombreConductor" placeholder="Tu Nombre"></ion-input>
+    <ion-button slot="end" fill="clear" (click)="activarEdicion('nombre')" *ngIf="!editMode.nombre">
+      <ion-icon name="pencil-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
 
-  <div class="autoinfo">
-    <h3>Foto del Auto</h3>
-    <ion-img src="assets/img/autito4.png" alt="Foto del auto"></ion-img>
-    <p>Patente: ABC123</p>
-  </div>
+  <!-- Patente del Vehículo -->
+  <ion-item>
+    <ion-label position="floating">Patente del Vehículo</ion-label>
+    <ion-input [readonly]="!editMode.patente" [(ngModel)]="patente" placeholder="ABC123"></ion-input>
+    <ion-button slot="end" fill="clear" (click)="activarEdicion('patente')" *ngIf="!editMode.patente">
+      <ion-icon name="pencil-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
 
+  <!-- Número de Contacto -->
+  <ion-item>
+    <ion-label position="floating">Número de Contacto</ion-label>
+    <ion-input [readonly]="!editMode.contacto" [(ngModel)]="numeroContacto" placeholder="+56912345678"></ion-input>
+    <ion-button slot="end" fill="clear" (click)="activarEdicion('contacto')" *ngIf="!editMode.contacto">
+      <ion-icon name="pencil-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <!-- Botón para guardar la información -->
+  <ion-button expand="block" color="primary" (click)="guardarPerfil()">Guardar Información</ion-button>
 </ion-content>
