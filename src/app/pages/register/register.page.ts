@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -13,7 +14,8 @@ export class RegisterPage {
 
   constructor(
     private authService: AuthService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private router: Router,
   ) {}
 
   async presentAlert(header: string, message: string) {
@@ -30,7 +32,7 @@ export class RegisterPage {
       .then(() => {
         console.log('Registro exitoso');
         this.presentAlert('Registro exitoso', 'Tu cuenta ha sido creada exitosamente.');
-        // Aquí puedes redirigir o hacer otra acción después del registro exitoso
+        this.router.navigate(['/home']);
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
