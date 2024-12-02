@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AlertController } from '@ionic/angular';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-perfil',
@@ -18,7 +19,8 @@ export class PerfilPage implements OnInit {
   constructor(
     private firestore: AngularFirestore,
     private afAuth: AngularFireAuth,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private storageService: StorageService
   ) {}
 
   ngOnInit() {
@@ -34,12 +36,15 @@ export class PerfilPage implements OnInit {
 
   private cargarPerfil() {
     if (this.userId) {
-      this.firestore.doc(`usuarios/${this.userId}/perfil/datos`).valueChanges().subscribe((perfil: any) => {
+      this.firestore.doc(`usuarios/${this.userId}/perfil/datos`).valueChanges().subscribe(async (perfil: any) => {
         if (perfil) {
           this.nombreConductor = perfil.nombreConductor || '';
           this.patente = perfil.patente || '';
           this.numeroContacto = perfil.numeroContacto || '';
           this.editMode = { nombre: false, patente: false, contacto: false };
+
+          // Guardar el perfil en el almacenamiento local
+          await this.storageService.set('userProfile', perfil);
         } else {
           console.log('No hay información de perfil disponible');
         }
@@ -60,16 +65,27 @@ export class PerfilPage implements OnInit {
     const perfilData = {
       nombreConductor: this.nombreConductor,
       patente: this.patente,
-      numeroContacto: this.numeroContacto
+      numeroContacto: this.numeroContacto,
     };
 
     try {
-      await this.firestore.collection('usuarios').doc(this.userId).collection('perfil').doc('datos').set(perfilData, { merge: true });
-      this.mostrarAlerta('Perfil Actualizado', 'La información del perfil se ha guardado correctamente.');
+      await this.firestore
+        .collection('usuarios')
+        .doc(this.userId)
+        .collection('perfil')
+        .doc('datos')
+        .set(perfilData, { merge: true });
+      this.mostrarAlerta(
+        'Perfil Actualizado',
+        'La información del perfil se ha guardado correctamente.'
+      );
       this.editMode = { nombre: false, patente: false, contacto: false };
     } catch (error) {
       console.error('Error al guardar el perfil:', error);
-      this.mostrarAlerta('Error', 'No se pudo guardar la información del perfil. Inténtalo de nuevo.');
+      this.mostrarAlerta(
+        'Error',
+        'No se pudo guardar la información del perfil. Inténtalo de nuevo.'
+      );
     }
   }
 
@@ -77,7 +93,7 @@ export class PerfilPage implements OnInit {
     const alert = await this.alertController.create({
       header: titulo,
       message: mensaje,
-      buttons: ['OK']
+      buttons: ['OK'],
     });
     await alert.present();
   }

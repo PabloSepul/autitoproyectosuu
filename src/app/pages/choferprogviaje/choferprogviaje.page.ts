@@ -1,10 +1,11 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import mapboxgl from 'mapbox-gl';
+import * as mapboxgl from 'mapbox-gl';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { ViajeService } from '../../services/viaje.service';
+import { StorageService} from '../../services/storage.service';
 
 @Component({
   selector: 'app-choferprogviaje',
@@ -27,7 +28,8 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
     private firestore: AngularFirestore,
     private afAuth: AngularFireAuth,
     private router: Router,
-    private viajeService: ViajeService
+    private viajeService: ViajeService,
+    private storageService: StorageService
   ) {}
 
   ngOnInit() {
@@ -127,6 +129,8 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
 
     try {
       await this.viajeService.guardarViaje(this.userId, viajeData);
+
+      await this.storageService.set('viajeActual', viajeData);
 
       this.router.navigate(['/choferprogconfirmar']);
     } catch (error) {

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-home',
@@ -12,12 +13,21 @@ export class HomePage {
   email: string = '';
   password: string = '';
 
-  constructor(private authService: AuthService, private router: Router,private alertController: AlertController) {}
+  constructor(private authService: AuthService,
+     private router: Router,
+     private alertController: AlertController,
+     private storageService: StorageService) {}
 
   login() {
     this.authService.login(this.email, this.password)
-      .then(() => {
+      .then(async() => {
         console.log('Inicio de sesión exitoso');
+
+        await this.storageService.set('userCredentials',{
+          email: this.email,
+          password: this.password,
+        });
+        
         this.router.navigate(['/choferben']); 
       })
       .catch(error => {

@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
   logout() {
     this.afAuth.signOut().then(() => {
       console.log('Usuario deslogueado');
-      this.router.navigate(['/home']); // Redirige a la página de inicio
+      this.router.navigate(['/home']);
     }).catch(error => {
       console.error('Error al cerrar sesión:', error);
     });
