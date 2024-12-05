@@ -43,7 +43,6 @@ export class PerfilPage implements OnInit {
           this.numeroContacto = perfil.numeroContacto || '';
           this.editMode = { nombre: false, patente: false, contacto: false };
 
-          // Guardar el perfil en el almacenamiento local
           await this.storageService.set('userProfile', perfil);
         } else {
           console.log('No hay información de perfil disponible');

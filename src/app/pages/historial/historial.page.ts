@@ -46,13 +46,13 @@ export class HistorialPage implements OnInit {
 
   ionViewWillEnter() {
     if (!navigator.onLine) {
-      // Cargar historial desde localStorage si no hay conexión
       this.historial = this.storageService.get('historial') || [];
+      console.log('Cargando historial offline:', this.historial);
     } else {
-      // Cargar historial desde Firestore y guardarlo localmente
       this.firestoreService.getHistorial().subscribe((data: any[]) => {
         this.historial = data;
         this.storageService.set('historial', data);
+        console.log('Historial sincronizado con Firestore:', this.historial);
       });
     }
   }
