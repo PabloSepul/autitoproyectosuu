@@ -44,4 +44,8 @@ export class AuthService {
     return savedCredentials || null;
   }
   
+  async isLoggedIn(): Promise<boolean> {
+    const user = await this.afAuth.currentUser;
+    return !!user;
+  }
 }

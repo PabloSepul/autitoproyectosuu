@@ -20,9 +20,14 @@ export class HomePage {
 
     async ionViewWillEnter() {
       try {
-        const userCredentials = await this.authService.checkStoredCredentials();
-        if (userCredentials) {
-          this.router.navigate(['/historial']);
+        const storedUser = await this.authService.checkStoredCredentials();
+        if (storedUser) {
+          const isLoggedIn = await this.authService.isLoggedIn();
+          if (isLoggedIn) {
+            this.router.navigate(['/historial']);
+          } else {
+            this.authService.logout(); // Elimina credenciales si no hay sesión activa
+          }
         }
       } catch (error) {
         console.error('Error al verificar credenciales:', error);
@@ -41,5 +46,4 @@ export class HomePage {
         }
       }
     }
-    
   }
