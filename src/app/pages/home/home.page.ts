@@ -17,22 +17,6 @@ export class HomePage {
     private router: Router,
     private alertController: AlertController,
     private storageService: StorageService) {}
-
-    async ionViewWillEnter() {
-      try {
-        const storedUser = await this.authService.checkStoredCredentials();
-        if (storedUser) {
-          const isLoggedIn = await this.authService.isLoggedIn();
-          if (isLoggedIn) {
-            this.router.navigate(['/historial']);
-          } else {
-            this.authService.logout(); // Elimina credenciales si no hay sesión activa
-          }
-        }
-      } catch (error) {
-        console.error('Error al verificar credenciales:', error);
-      }
-    }
   
     async login() {
       try {
