@@ -15,9 +15,12 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<void> {
     if (!navigator.onLine) {
-      const savedCredentials = await this.storageService.get('userCredentials');
+      const savedCredentials = this.storageService.get('userCredentials');
+      console.log('Credenciales almacenadas:', savedCredentials);
+
       if (savedCredentials && savedCredentials.email === email && savedCredentials.password === password) {
         this.isAuthenticated = true;
+        localStorage.setItem('userSession', JSON.stringify({ email }));
         console.log('Inicio de sesión offline exitoso');
         return;
       } else {
@@ -25,21 +28,39 @@ export class AuthService {
       }
     }
 
-    const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
-    if (userCredential.user) {
-      this.isAuthenticated = true;
-      await this.storageService.set('userCredentials', { email, password });
-      console.log('Credenciales guardadas en almacenamiento local');
+    try {
+      const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
+      if (userCredential.user) {
+        this.isAuthenticated = true;
+
+        console.log('Guardando credenciales en StorageService...');
+        await this.storageService.set('userCredentials', { email, password });
+
+        localStorage.setItem('userSession', JSON.stringify({ email }));
+        console.log('Inicio de sesión online exitoso y credenciales guardadas');
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      throw new Error('Error al contactar con el servidor. Verifica tu conexión.');
     }
   }
 
   logout(): void {
     this.isAuthenticated = false;
     this.afAuth.signOut();
+    console.log('Sesión cerrada y credenciales eliminadas');
   }
 
   async checkStoredCredentials(): Promise<boolean> {
+    const session = localStorage.getItem('userSession');
+    if (session) {
+      this.isAuthenticated = true;
+      console.log('Sesión activa encontrada en localStorage');
+      return true;
+    }
+
     const savedCredentials = await this.storageService.get('userCredentials');
+    console.log('Credenciales almacenadas recuperadas:', savedCredentials);
     this.isAuthenticated = !!savedCredentials;
     return this.isAuthenticated;
   }
