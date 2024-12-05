@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { StorageService } from '../../services/storage.service';
+import { FirestoreService } from '../../services/firestore.service';
+
 
 @Component({
   selector: 'app-historial',
@@ -13,7 +16,9 @@ export class HistorialPage implements OnInit {
 
   constructor(
     private firestore: AngularFirestore,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth,
+    private storageService: StorageService,
+    private firestoreService: FirestoreService,
   ) {}
 
   ngOnInit() {
@@ -36,6 +41,19 @@ export class HistorialPage implements OnInit {
           this.historial = historial;
           console.log('Historial de viajes cargado:', this.historial);
         });
+    }
+  }
+
+  ionViewWillEnter() {
+    if (!navigator.onLine) {
+      // Cargar historial desde localStorage si no hay conexión
+      this.historial = this.storageService.get('historial') || [];
+    } else {
+      // Cargar historial desde Firestore y guardarlo localmente
+      this.firestoreService.getHistorial().subscribe((data: any[]) => {
+        this.historial = data;
+        this.storageService.set('historial', data);
+      });
     }
   }
 }

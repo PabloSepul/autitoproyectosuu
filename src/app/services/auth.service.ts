@@ -38,4 +38,10 @@ export class AuthService {
     this.storageService.remove('userCredentials');
     return this.afAuth.signOut();
   }
+
+  async checkStoredCredentials(): Promise<any> {
+    const savedCredentials = await this.storageService.get('userCredentials');
+    return savedCredentials || null;
+  }
+  
 }

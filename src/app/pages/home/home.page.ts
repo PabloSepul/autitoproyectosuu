@@ -14,36 +14,32 @@ export class HomePage {
   password: string = '';
 
   constructor(private authService: AuthService,
-     private router: Router,
-     private alertController: AlertController,
-     private storageService: StorageService) {}
+    private router: Router,
+    private alertController: AlertController,
+    private storageService: StorageService) {}
 
-  login() {
-    this.authService.login(this.email, this.password)
-      .then(async() => {
-        console.log('Inicio de sesión exitoso');
-
-        await this.storageService.set('userCredentials',{
-          email: this.email,
-          password: this.password,
-        });
-        
-        this.router.navigate(['/choferben']); 
-      })
-      .catch(error => {
-        console.error('Error en inicio de sesión:', error);
-        this.presentAlert('Usuario o contraseña incorrectos.'); 
-      });
-  }
+    async ionViewWillEnter() {
+      try {
+        const userCredentials = await this.authService.checkStoredCredentials();
+        if (userCredentials) {
+          this.router.navigate(['/historial']);
+        }
+      } catch (error) {
+        console.error('Error al verificar credenciales:', error);
+      }
+    }
   
-
-  async presentAlert(message: string) {
-    const alert = await this.alertController.create({
-      header: 'Error de inicio de sesión',
-      message: message,
-      buttons: ['OK']
-    });
-  
-    await alert.present();
+    async login() {
+      try {
+        await this.authService.login(this.email, this.password);
+        this.router.navigate(['/historial']);
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error('Error al iniciar sesión:', err.message);
+        } else {
+          console.error('Error al iniciar sesión:', err);
+        }
+      }
+    }
+    
   }
-}
