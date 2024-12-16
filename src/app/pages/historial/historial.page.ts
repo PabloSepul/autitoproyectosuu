@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { ViajeService } from '../../services/viaje.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-historial',
@@ -9,49 +8,42 @@ import { Router } from '@angular/router';
   styleUrls: ['./historial.page.scss'],
 })
 export class HistorialPage implements OnInit {
+  historial: any[] = []; // Almacena el historial de viajes del usuario
   userId: string | null = null; // ID del usuario autenticado
-  historialViajes: any[] = []; // Lista de viajes en el historial
 
   constructor(
-    private afAuth: AngularFireAuth, // Servicio para manejar autenticación de Firebase
-    private viajeService: ViajeService, // Servicio para gestionar viajes
-    private router: Router // Servicio para redirigir entre rutas
+    private firestore: AngularFirestore,
+    private afAuth: AngularFireAuth
   ) {}
 
   ngOnInit() {
-    // Suscribirse al estado de autenticación del usuario
     this.afAuth.authState.subscribe((user) => {
       if (user) {
-        this.userId = user.uid; // Almacenar el ID del usuario autenticado
-        this.loadHistorial(); // Cargar el historial de viajes
+        this.userId = user.uid;
+        this.cargarHistorial();
       } else {
-        console.error('Usuario no autenticado');
-        this.router.navigate(['/home']); // Redirigir a la página de inicio si no está autenticado
+        console.error('Usuario no autenticado.');
       }
     });
   }
 
   /**
-   * Cargar el historial de viajes desde Firestore o localStorage.
+   * Cargar el historial de viajes del usuario actual.
    */
-  loadHistorial() {
-    this.viajeService.obtenerHistorial().subscribe((historial) => {
-      if (historial && historial.length > 0) {
-        this.historialViajes = historial; // Asignar los datos del historial
-        console.log('Historial de viajes cargado:', this.historialViajes);
-      } else {
-        console.warn('No se encontraron viajes en el historial.');
-        this.historialViajes = []; // Asegurar que la lista esté vacía si no hay datos
-      }
-    });
-  }
+  cargarHistorial() {
+    if (!this.userId) {
+      console.error('Usuario no autenticado, no se puede cargar el historial.');
+      return;
+    }
 
-  /**
-   * Navegar a los detalles de un viaje seleccionado.
-   * @param viaje Datos del viaje seleccionado.
-   */
-  verDetalles(viaje: any) {
-    console.log('Detalles del viaje seleccionado:', viaje);
-    // Aquí podrías implementar navegación a una página de detalles o mostrar un modal
+    this.firestore
+      .collection(`usuarios/${this.userId}/historial`, (ref) =>
+        ref.orderBy('fechaFinalizacion', 'desc')
+      )
+      .valueChanges()
+      .subscribe((historial: any[]) => {
+        this.historial = historial;
+        console.log('Historial cargado:', this.historial);
+      });
   }
 }

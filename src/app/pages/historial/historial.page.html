@@ -5,30 +5,27 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- Mostrar lista de viajes si hay elementos en historial -->
-  <ion-list *ngIf="historialViajes.length > 0; else noHistorial">
-    <ion-item *ngFor="let viaje of historialViajes">
-      <ion-label>
-        <h2>Origen: {{ viaje.origen || 'N/A' }}</h2>
-        <p>Destino: {{ viaje.destino || 'N/A' }}</p>
-        <p>Fecha: {{ viaje.fecha | date: 'short' }}</p>
-        <p>Pasajeros: {{ viaje.pasajeros?.length || 0 }}</p>
-        <p>Nombre del Conductor: {{ viaje.nombreConductor || 'N/A' }}</p>
-        <p>Nombres de Pasajeros:</p>
-        <ul>
-          <li *ngFor="let pasajero of viaje.pasajeros">
-            {{ pasajero || 'Desconocido' }}
-          </li>
-        </ul>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  <ion-card *ngFor="let viaje of historial">
+    <ion-card-header>
+      <ion-card-title>Origen: {{ viaje.origen }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Destino:</strong> {{ viaje.destino }}</p>
+      <p><strong>Fecha:</strong> {{ viaje.fechaFinalizacion | date }}</p>
+      <p><strong>Pasajeros:</strong></p>
+      <ul>
+        <li *ngFor="let pasajero of viaje.nombresPasajeros">
+          {{ pasajero }}
+        </li>
+      </ul>
+    </ion-card-content>
+  </ion-card>
+  
 
-  <!-- Mostrar mensaje si no hay historial -->
   <ng-template #noHistorial>
     <div class="ion-text-center">
       <ion-text color="medium">
-        <h2>No hay viajes registrados en el historial</h2>
+        <h2>No hay viajes en el historial</h2>
       </ion-text>
     </div>
   </ng-template>

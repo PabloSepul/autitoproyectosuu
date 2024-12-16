@@ -4,6 +4,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { ViajeService } from '../../services/viaje.service';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-chofviajecurso',
@@ -65,56 +66,55 @@ export class ChofviajecursoPage implements OnInit {
    * Finalizar el viaje actual y guardarlo en el historial.
    */
   async finalizarViaje() {
-    if (!this.userId) {
-      console.error('No se puede finalizar el viaje. Usuario no autenticado.');
+    if (!this.viaje?.id) {
+      console.warn('No se encontró un ID válido para finalizar el viaje.');
       return;
     }
-
-    // Crear una alerta para confirmar la finalización del viaje
-    const alert = await this.alertController.create({
-      header: 'Finalizar Viaje',
-      message: '¿Estás seguro de que deseas finalizar el viaje?',
-      buttons: [
-        {
-          text: 'Cancelar', // Botón para cancelar la acción
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Finalización del viaje cancelada.');
-          },
-        },
-        {
-          text: 'Finalizar', // Botón para confirmar la finalización
-          handler: async () => {
-            try {
-              const viajeFinalizado = {
-                ...this.viaje, // Copiar los datos del viaje actual
-                fechaFinalizacion: new Date().toISOString(), // Agregar la fecha de finalización
-              };
-              await this.viajeService.agregarViajeAlHistorial(this.userId!, viajeFinalizado); // Guardar en el historial
-              console.log('Viaje finalizado y guardado en el historial.');
-
-              // Eliminar el viaje activo después de moverlo al historial
-              await this.firestore.doc(`viajes/${this.viaje.id}`).delete();
-              console.log('Viaje activo eliminado correctamente.');
-
-              this.router.navigate(['/historial']); // Redirigir al historial de viajes
-            } catch (error) {
-              console.error('Error al finalizar el viaje:', error);
-
-              // Mostrar una alerta en caso de error
-              const errorAlert = await this.alertController.create({
-                header: 'Error',
-                message: 'Ocurrió un error al finalizar el viaje. Inténtalo nuevamente.',
-                buttons: ['OK'],
-              });
-              await errorAlert.present();
+  
+    const historialData = { ...this.viaje, fechaFinalizacion: new Date().toISOString() };
+  
+    try {
+      // Obtener nombres de los pasajeros desde la subcolección 'perfil/datos'
+      const nombresPasajeros: string[] = await Promise.all(
+        (this.viaje.pasajeros || []).map(async (pasajeroId: string) => {
+          try {
+            console.log('Pasajero ID:', pasajeroId);
+            const pasajeroRef = this.firestore
+              .doc(`usuarios/${pasajeroId}/perfil/datos`) // Acceder a la ruta específica
+              .get();
+            const pasajeroSnapshot = await lastValueFrom(pasajeroRef);
+  
+            if (pasajeroSnapshot.exists) {
+              const pasajeroData = pasajeroSnapshot.data() as { nombreConductor?: string };
+              console.log('Pasajero Data:', pasajeroData);
+              return pasajeroData?.nombreConductor || 'No Registrado';
+            } else {
+              console.log(`No se encontró el documento del pasajero ${pasajeroId}`);
+              return 'No Registrado';
             }
-          },
-        },
-      ],
-    });
-
-    await alert.present(); // Mostrar la alerta al usuario
+          } catch (error) {
+            console.error(`Error al obtener datos del pasajero ${pasajeroId}:`, error);
+            return 'No Registrado';
+          }
+        })
+      );
+  
+      // Agregar los nombres al historial
+      historialData.nombresPasajeros = nombresPasajeros;
+  
+      // Guardar en el historial del conductor
+      await this.firestore.collection(`usuarios/${this.userId}/historial`).add(historialData);
+  
+      console.log('Viaje finalizado y guardado en el historial correctamente.');
+  
+      // Eliminar el viaje activo
+      await this.firestore.doc(`viajes/${this.viaje.id}`).delete();
+      console.log('Viaje activo eliminado correctamente.');
+  
+      this.router.navigate(['/choferben']);
+    } catch (error) {
+      console.error('Error al finalizar el viaje:', error);
+      alert('Hubo un problema al finalizar el viaje. Inténtalo nuevamente.');
+    }
   }
 }

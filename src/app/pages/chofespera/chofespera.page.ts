@@ -3,13 +3,17 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 
+interface Usuario {
+  nombreConductor: string; // Definimos explícitamente la propiedad
+}
+
 @Component({
   selector: 'app-chofespera',
   templateUrl: './chofespera.page.html',
   styleUrls: ['./chofespera.page.scss'],
 })
 export class ChofesperaPage implements OnInit {
-  viaje: any = null; // Información del viaje
+  viaje: any = null; // Información del viaje actual
   userId: string | null = null; // ID del usuario autenticado
 
   constructor(
@@ -34,10 +38,7 @@ export class ChofesperaPage implements OnInit {
    * Cargar el último viaje configurado por el usuario actual.
    */
   cargarUltimoViaje() {
-    if (!this.userId) {
-      console.error('Usuario no autenticado, no se puede cargar el viaje.');
-      return;
-    }
+    if (!this.userId) return;
 
     this.firestore
       .collection('viajes', (ref) =>
@@ -46,71 +47,67 @@ export class ChofesperaPage implements OnInit {
       .valueChanges({ idField: 'id' })
       .subscribe((viajes: any[]) => {
         if (viajes.length > 0) {
-          this.viaje = viajes[0]; // Obtenemos el último viaje configurado
-          console.log('Último viaje configurado cargado para chofespera:', this.viaje);
+          this.viaje = viajes[0];
+          console.log('Viaje actual:', this.viaje);
         } else {
-          console.warn('No se encontraron datos de viaje para el usuario actual.');
+          console.warn('No se encontró un viaje activo.');
         }
       });
   }
 
   /**
-   * Finalizar el viaje actual y guardar los nombres de los pasajeros en el historial.
+   * Finalizar el viaje y obtener los nombres de los pasajeros.
    */
-  finalizarViaje() {
-    if (!this.viaje?.id) {
-      console.warn('No se encontró un ID válido para finalizar el viaje.');
-      return;
-    }
+  async finalizarViaje() {
+    if (!this.viaje?.id) return;
 
-    const historialData = { ...this.viaje, fechaFinalizacion: new Date().toISOString() }; // Copiar datos del viaje
+    const historialData = { ...this.viaje, fechaFinalizacion: new Date().toISOString() };
 
     // Obtener nombres de los pasajeros desde la colección "usuarios"
-    const obtenerNombresPasajeros = async () => {
-      const pasajerosConNombres = await Promise.all(
-        (this.viaje.pasajeros || []).map(async (pasajeroId: string) => {
-          try {
-            // Buscar en la colección "usuarios" el ID del pasajero
-            const pasajeroDoc = await this.firestore.doc(`usuarios/${pasajeroId}`).get().toPromise();
-            const pasajeroData = pasajeroDoc?.data() as { nombreConductor?: string }; // Tipar explícitamente
-            return pasajeroData?.nombreConductor || 'No Registrado'; // Extraer el nombre o usar "No Registrado"
-          } catch (error) {
-            console.error(`Error al obtener datos del pasajero ${pasajeroId}:`, error);
-            return 'No Registrado';
-          }
-        })
-      );
-      return pasajerosConNombres;
-    };
+    const nombresPasajeros = await Promise.all(
+      (this.viaje.pasajeros || []).map(async (pasajeroId: string) => {
+        try {
+          const pasajeroDoc = await this.firestore.doc(`usuarios/${pasajeroId}`).get().toPromise();
+          const pasajeroData = pasajeroDoc?.data() as Usuario | undefined; // Casteo explícito
+          return pasajeroData?.nombreConductor || 'No Registrado';
+        } catch {
+          return 'No Registrado';
+        }
+      })
+    );
 
-    obtenerNombresPasajeros().then((nombresPasajeros) => {
-      historialData.pasajerosNombres = nombresPasajeros; // Agregar nombres de pasajeros al historial
+    historialData['pasajerosNombres'] = nombresPasajeros;
 
-      this.firestore
-        .collection(`usuarios/${this.userId}/historial`) // Guardar en el historial del usuario
-        .add(historialData)
-        .then(() => {
-          console.log('Viaje guardado en el historial correctamente con nombres de pasajeros.');
-
-          // Eliminar el viaje activo
-          return this.firestore.doc(`viajes/${this.viaje.id}`).delete();
-        })
-        .then(() => {
-          console.log('Viaje activo eliminado correctamente.');
-          this.router.navigate(['/choferben']); // Redirigir al menú principal
-        })
-        .catch((error) => {
-          console.error('Error al finalizar el viaje:', error);
-          alert('Hubo un problema al finalizar el viaje. Inténtalo nuevamente.');
-        });
-    });
+    // Guardar en el historial del chofer
+    this.firestore
+      .collection(`usuarios/${this.userId}/historial`)
+      .add(historialData)
+      .then(() => {
+        console.log('Viaje finalizado y guardado en el historial correctamente.');
+        this.firestore.doc(`viajes/${this.viaje.id}`).delete(); // Eliminar el viaje activo
+        this.router.navigate(['/choferben']);
+      })
+      .catch((error) => {
+        console.error('Error al finalizar el viaje:', error);
+        alert('No se pudo finalizar el viaje. Inténtalo nuevamente.');
+      });
   }
-  confirmarCancelacion() {
-    if (!this.viaje?.id) {
-      console.warn('No se encontró un ID válido para cancelar el viaje.');
-      return;
-    }
+  /**
+ * Confirmar la cancelación del viaje actual.
+ */
+confirmarCancelacion() {
+  if (!this.viaje?.id) {
+    console.warn('No se puede cancelar el viaje. No se encontró un ID válido.');
+    return;
+  }
 
+  if (!this.userId) {
+    console.warn('No se puede cancelar el viaje. Usuario no autenticado.');
+    return;
+  }
+
+  // Confirmación visual al usuario
+  if (confirm('¿Estás seguro de que deseas cancelar el viaje?')) {
     this.firestore
       .doc(`viajes/${this.viaje.id}`)
       .delete()
@@ -123,4 +120,6 @@ export class ChofesperaPage implements OnInit {
         alert('No se pudo cancelar el viaje. Inténtalo nuevamente.');
       });
   }
+}
+
 }
