@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-usuplan',
@@ -10,114 +9,93 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./usuplan.page.scss'],
 })
 export class UsuplanPage implements OnInit {
-  viajes: any[] = [];
-  userId: string | undefined;
+  viajes: any[] = []; // Lista de viajes disponibles
+  userId: string | null = null; // ID del usuario autenticado
 
   constructor(
     private firestore: AngularFirestore,
     private afAuth: AngularFireAuth,
-    private router: Router,
-    private alertController: AlertController
+    private router: Router
   ) {}
-  
+
   ngOnInit() {
-    this.afAuth.authState.subscribe(user => {
+    this.afAuth.authState.subscribe((user) => {
       if (user) {
         this.userId = user.uid;
+        this.actualizarViajes();
       } else {
-        console.warn('Usuario no autenticado. Redirigiendo al inicio de sesión.');
-        this.router.navigate(['/home']); 
+        console.error('Usuario no autenticado.');
+        this.router.navigate(['/home']);
       }
     });
   }
 
-  ionViewWillEnter() {
-    this.obtenerViajes();
+  /**
+   * Actualizar la lista de viajes disponibles desde Firestore.
+   */
+  actualizarViajes() {
+    this.firestore
+      .collection('viajes', (ref) => ref.where('asientosDisponibles', '>', 0))
+      .valueChanges({ idField: 'id' })
+      .subscribe(
+        (viajes: any[]) => {
+          console.log('Viajes obtenidos de Firestore:', viajes); // Depuración
+          this.viajes = viajes || [];
+          if (this.viajes.length === 0) {
+            console.warn('No se encontraron viajes disponibles.');
+          }
+        },
+        (error) => {
+          console.error('Error al cargar los viajes:', error);
+        }
+      );
   }
+  
 
-  obtenerViajes() {
-    this.firestore.collectionGroup('viajes', ref => ref.where('asientosDisponibles', '>', 0))
-      .snapshotChanges()
-      .subscribe(snapshot => {
-        this.viajes = snapshot.map(doc => {
-          return {
-            id: doc.payload.doc.id,
-            ...doc.payload.doc.data() as any
-          };
-        });
-        console.log('Viajes obtenidos:', this.viajes);
-      });
-  }
-
-  unirseAViaje(viajeId: string, redirigir: boolean = true) {
-    if (!this.userId) return;
+  /**
+   * Confirmar si el usuario desea unirse a un viaje.
+   * @param viajeId ID del viaje seleccionado.
+   */
+  async confirmarUnirseAViaje(viajeId: string) {
+    if (!this.userId) {
+      console.error('Error: Usuario no autenticado.');
+      alert('Debes iniciar sesión para unirte a un viaje.');
+      return;
+    }
   
-    const viajeRef = this.firestore.collection('usuarios').doc(this.userId).collection('viajes').doc(viajeId);
+    try {
+      const viajeRef = this.firestore.doc(`viajes/${viajeId}`);
+      const viajeSnap = await viajeRef.get().toPromise();
   
-    this.firestore.firestore.runTransaction(async transaction => {
-      const viajeDoc = await transaction.get(viajeRef.ref);
-  
-      if (!viajeDoc.exists) {
-        console.error('El viaje no existe');
+      if (!viajeSnap?.exists) {
+        alert('El viaje ya no está disponible.');
         return;
       }
   
-      const viajeData = viajeDoc.data();
-  
-      if (viajeData && viajeData['asientosDisponibles'] > 0) {
-        const nuevosPasajeros = [...viajeData['pasajeros'], this.userId];
-        const asientosDisponiblesActualizados = viajeData['asientosDisponibles'] - 1;
-  
-        transaction.update(viajeRef.ref, {
-          pasajeros: nuevosPasajeros,
-          asientosDisponibles: asientosDisponiblesActualizados
-        });
-  
-        console.log('Te has unido al viaje:', viajeId);
-      } else {
-        console.error('No hay asientos disponibles en este viaje');
+      const viaje = viajeSnap.data() as any;
+      if (viaje.asientosDisponibles <= 0) {
+        alert('No hay asientos disponibles para este viaje.');
+        return;
       }
-    }).then(() => {
-      console.log('Transacción de unirse al viaje completada');
-      if (redirigir) {
-        this.router.navigate(['/chofviajecurso', { viajeId: viajeId }]);
-      }
-    }).catch(error => {
+  
+      // Actualizar el viaje en Firestore
+      viaje.asientosDisponibles -= 1;
+      viaje.pasajeros.push(this.userId);
+  
+      await viajeRef.update({
+        asientosDisponibles: viaje.asientosDisponibles,
+        pasajeros: viaje.pasajeros,
+      });
+  
+      console.log('Te has unido al viaje exitosamente:', viaje);
+      alert('Te has unido al viaje exitosamente.');
+  
+      // Redirigir a la página de confirmación
+      this.router.navigate(['/usuconf']);
+    } catch (error) {
       console.error('Error al unirse al viaje:', error);
-    });
+      alert('Hubo un problema al unirse al viaje. Inténtalo de nuevo.');
+    }
   }
   
-
-  actualizarViajes() {
-    this.obtenerViajes();
-  }
-
-  actualizarViaje(viajeId: string) {
-    this.unirseAViaje(viajeId, false);
-  }
-
-  async confirmarUnirseAViaje(viajeId: string) {
-    const alert = await this.alertController.create({
-      header: 'Confirmar',
-      message: '¿Estás seguro de que deseas unirte a este viaje?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log('Unión al viaje cancelada');
-          }
-        },
-        {
-          text: 'Sí',
-          handler: () => {
-            this.unirseAViaje(viajeId);
-          }
-        }
-      ]
-    });
-  
-    await alert.present();
-  }
-
 }

@@ -13,10 +13,6 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'inicio',
-    loadChildren: () => import('./pages/inicio/inicio.module').then( m => m.InicioPageModule)
-  },
-  {
     path: 'recuperar',
     loadChildren: () => import('./pages/recuperar/recuperar.module').then( m => m.RecuperarPageModule)
   },
@@ -41,10 +37,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/choferprogconfirmar/choferprogconfirmar.module').then( m => m.ChoferprogconfirmarPageModule)
   },
   {
-    path: 'choferprognoti',
-    loadChildren: () => import('./pages/choferprognoti/choferprognoti.module').then( m => m.ChoferprognotiPageModule)
-  },
-  {
     path: 'usuplan',
     loadChildren: () => import('./pages/usuplan/usuplan.module').then( m => m.UsuplanPageModule)
   },
@@ -55,10 +47,6 @@ const routes: Routes = [
   {
     path: 'usuesp',
     loadChildren: () => import('./pages/usuesp/usuesp.module').then( m => m.UsuespPageModule)
-  },
-  {
-    path: 'usuacep',
-    loadChildren: () => import('./pages/usuacep/usuacep.module').then( m => m.UsuacepPageModule)
   },
   {
     path: 'historial',

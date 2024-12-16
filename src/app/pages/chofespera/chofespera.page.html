@@ -8,20 +8,30 @@
   <div class="esperador">
     <h2>ESPERANDO PASAJEROS</h2>
 
+    <!-- Icono animado de espera -->
     <ion-icon name="sync-outline" class="girar"></ion-icon>
 
-    <p><strong>Origen:</strong> {{ origen }}</p>
-    <p><strong>Destino:</strong> {{ destino }}</p>
-    <p><strong>Asientos Totales:</strong> {{ asientos }}</p>
-    <p><strong>Asientos Disponibles:</strong> {{ asientosDisponibles }}</p>
-    <p><strong>Precio:</strong> ${{ precio }}</p>
+    <!-- Detalles del viaje -->
+    <p><strong>Origen:</strong> {{ viaje?.origen || 'N/A' }}</p>
+    <p><strong>Destino:</strong> {{ viaje?.destino || 'N/A' }}</p>
+    <p><strong>Asientos Totales:</strong> {{ viaje?.asientos || 0 }}</p>
+    <p><strong>Asientos Disponibles:</strong> {{ viaje?.asientosDisponibles || 0 }}</p>
+    <p><strong>Precio:</strong> ${{ viaje?.precio || 'N/A' }}</p>
 
-    <ion-button [disabled]="asientosDisponibles === asientos" routerLink="/chofviajecurso" expand="block" class="button">
+    <!-- Botón para comenzar el viaje -->
+    <ion-button [disabled]="viaje?.asientosDisponibles === viaje?.asientos" 
+                routerLink="/chofviajecurso" 
+                expand="block" 
+                class="button">
       COMENZAR VIAJE
     </ion-button>
 
-    <ion-button color="danger" (click)="confirmarCancelacion()" expand="block" class="button">
+    <!-- Botón para cancelar el viaje -->
+    <ion-button color="danger" 
+                (click)="confirmarCancelacion()" 
+                expand="block" 
+                class="button">
       CANCELAR VIAJE
-    </ion-button>    
+    </ion-button>
   </div>
 </ion-content>

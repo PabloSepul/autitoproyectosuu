@@ -5,7 +5,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { ViajeService } from '../../services/viaje.service';
-import { StorageService} from '../../services/storage.service';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-choferprogviaje',
@@ -16,8 +16,8 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
   map: mapboxgl.Map | undefined;
   destination: mapboxgl.LngLat | undefined;
   destinationName: string = '';
-  asientos: number = 3;
-  precio: number = 4000;
+  asientos: number = 0;
+  precio: number = 0;
   patente: string = '';
   nombreConductor: string = '';
   numeroContacto: string = '';
@@ -35,11 +35,12 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
   ngOnInit() {
     (mapboxgl as any).accessToken = environment.mapboxKey;
 
-    this.afAuth.authState.subscribe(user => {
+    this.afAuth.authState.subscribe((user) => {
       if (user) {
         this.userId = user.uid;
         this.cargarPerfilUsuario();
       } else {
+        console.warn('Usuario no autenticado, redirigiendo a inicio.');
         this.router.navigate(['/home']);
       }
     });
@@ -49,7 +50,7 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
     this.initializeMap();
   }
 
-  initializeMap() {
+  private initializeMap() {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v11',
@@ -76,7 +77,7 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
       this.map.flyTo({
         center: [lng, lat],
         zoom: 15,
-        essential: true
+        essential: true,
       });
 
       setTimeout(() => {
@@ -89,52 +90,76 @@ export class ChoferprogviajePage implements OnInit, AfterViewInit {
 
   private reverseGeocode(lng: number, lat: number) {
     fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${environment.mapboxKey}`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         this.destinationName = data.features[0]?.place_name || 'Destino desconocido';
+      })
+      .catch((error) => {
+        console.error('Error en la geocodificación inversa:', error);
+        this.destinationName = 'Error al identificar el destino';
       });
   }
 
   private cargarPerfilUsuario() {
     if (this.userId) {
-      this.firestore.doc(`usuarios/${this.userId}/perfil/datos`).valueChanges().subscribe((perfil: any) => {
-        if (perfil) {
-          this.patente = perfil.patente || '';
-          this.nombreConductor = perfil.nombreConductor || '';
-          this.numeroContacto = perfil.numeroContacto || '';
-        } else {
-          console.log('No hay información de perfil disponible para cargar.');
-        }
-      });
+      this.firestore
+        .doc(`usuarios/${this.userId}/perfil/datos`)
+        .valueChanges()
+        .subscribe((perfil: any) => {
+          if (perfil) {
+            this.patente = perfil.patente || '';
+            this.nombreConductor = perfil.nombreConductor || '';
+            this.numeroContacto = perfil.numeroContacto || '';
+          } else {
+            console.warn('No hay información de perfil disponible.');
+          }
+        });
     }
   }
 
   async programarViaje() {
-    if (!this.destination || !this.userId || !this.patente || !this.nombreConductor || !this.numeroContacto) {
+    if (!this.isFormValid()) {
       alert('Por favor, completa toda la información y selecciona un destino en el mapa.');
       return;
     }
-
+  
     const viajeData = {
       origen: 'Duoc UC - Concepción',
       destino: this.destinationName,
       asientos: this.asientos,
-      asientosDisponibles: this.asientos - 1,
+      asientosDisponibles: this.asientos,
       precio: this.precio,
       patente: this.patente,
       nombreConductor: this.nombreConductor,
       numeroContacto: this.numeroContacto,
-      pasajeros: [this.userId] 
+      pasajeros: [],
+      creadorId: this.userId, // Identifica al creador del viaje
+      fechaCreacion: new Date().toISOString(), // Campo necesario para ordenar
     };
-
+  
     try {
-      await this.viajeService.guardarViaje(this.userId, viajeData);
-
-      await this.storageService.set('viajeActual', viajeData);
-
+      await this.firestore.collection('viajes').add(viajeData);
+      console.log('Viaje creado exitosamente:', viajeData);
+      alert('Viaje creado exitosamente.');
       this.router.navigate(['/choferprogconfirmar']);
     } catch (error) {
-      alert('Error al guardar el viaje. Inténtalo de nuevo.');
+      console.error('Error al crear el viaje:', error);
+      alert('Error al crear el viaje. Inténtalo nuevamente.');
     }
+  }
+  
+
+  isFormValid(): boolean {
+    const valid =
+      this.asientos > 0 &&
+      this.patente.trim().length > 0 &&
+      this.nombreConductor.trim().length > 0 &&
+      this.numeroContacto.trim().length > 0 &&
+      this.precio > 0 &&
+      this.destinationName.trim().length > 0;
+  
+    // Imprimir resultado de validación para depuración
+    console.log('Formulario válido:', valid);
+    return valid;
   }
 }

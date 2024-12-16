@@ -1,66 +1,73 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController } from '@ionic/angular';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-usuconf',
   templateUrl: './usuconf.page.html',
   styleUrls: ['./usuconf.page.scss'],
 })
-
 export class UsuconfPage implements OnInit {
-  conductor: any;
-  tiempoRestante: string = '10:00';
-  intervalo: any;
+  conductor: any = null; // Información del conductor
+  tiempoRestante: string = ''; // Hora máxima de llegada
+  userId: string | null = null; // ID del usuario autenticado
+  llegadaConfirmada: boolean = false; // Estado de confirmación de llegada
 
   constructor(
-    private alertController: AlertController,
-    private navCtrl: NavController
+    private firestore: AngularFirestore,
+    private afAuth: AngularFireAuth
   ) {}
 
   ngOnInit() {
-
-    this.conductor = {
-      nombre: 'Rocio',
-      foto: 'assets/img/rocio.png',
-      patente: 'ABC123'
-    };
-
-
-    this.iniciarContador(50 * 60); 
-  }
-
-  iniciarContador(duracion: number) {
-    let segundosRestantes = duracion;
-
-    this.intervalo = setInterval(() => {
-      const minutos = Math.floor(segundosRestantes / 60);
-      const segundos = segundosRestantes % 60;
-
-      this.tiempoRestante = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-
-      if (segundosRestantes > 0) {
-        segundosRestantes--;
+    this.afAuth.authState.subscribe((user) => {
+      if (user) {
+        this.userId = user.uid;
+        this.cargarInformacionConductor();
       } else {
-        clearInterval(this.intervalo);
-        this.tiempoRestante = 'Tiempo agotado';
+        console.error('Usuario no autenticado.');
       }
-    }, 1000);
+    });
   }
 
-  async confirmarViaje(conductor: string) {
-    const successAlert = await this.alertController.create({
-      header: 'Confirmado',
-      message: `Que tengas un buen viaje`,
-      buttons: [
-        {
-          text: 'OK',
-          handler: () => {
-            this.navCtrl.navigateForward('/usuesp');
-          }
-        }
-      ]
-    });
+  /**
+   * Cargar la información del conductor del viaje al que el usuario se unió.
+   */
+  cargarInformacionConductor() {
+    if (!this.userId) {
+      console.error('Usuario no autenticado, no se puede cargar el conductor.');
+      return;
+    }
 
-    await successAlert.present();
+    this.firestore
+      .collection('viajes', (ref) =>
+        ref.where('pasajeros', 'array-contains', this.userId)
+      )
+      .valueChanges({ idField: 'id' })
+      .subscribe((viajes: any[]) => {
+        if (viajes.length > 0) {
+          const viaje = viajes[0]; // Asumimos que el usuario está en un único viaje
+          this.conductor = {
+            nombreConductor: viaje.nombreConductor,
+            patente: viaje.patente,
+            numeroContacto: viaje.numeroContacto,
+            foto: viaje.foto || null, // Aseguramos que foto sea opcional
+          };
+
+          // Simulamos un tiempo de llegada
+          this.tiempoRestante = '15 minutos';
+          console.log('Conductor cargado:', this.conductor);
+        } else {
+          console.warn('No se encontraron viajes para este usuario.');
+        }
+      });
+  }
+
+  /**
+   * Confirmar llegada al conductor.
+   */
+  confirmarLlegada() {
+    this.llegadaConfirmada = true; // Cambiar el estado para deshabilitar el botón
+    alert('Has confirmado tu llegada al conductor.');
+    console.log('Llegada confirmada para el conductor:', this.conductor);
   }
 }

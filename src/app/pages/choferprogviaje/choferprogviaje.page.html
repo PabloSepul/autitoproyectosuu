@@ -3,6 +3,7 @@
     <h4>Programa tu viaje</h4>
   </div>
 
+  <!-- Origen fijo y deshabilitado -->
   <ion-item>
     <ion-label>Origen</ion-label>
     <ion-select value="duoc" disabled>
@@ -10,51 +11,53 @@
     </ion-select>
   </ion-item>
 
+  <!-- Selección de asientos -->
   <ion-list>
     <ion-item>
       <ion-label>Asientos<ion-text color="danger">(Obligatorio)</ion-text></ion-label>
       <ion-select placeholder="Asientos disponibles" interface="action-sheet" [(ngModel)]="asientos">
-        <ion-select-option value="1">1</ion-select-option>
-        <ion-select-option value="2">2</ion-select-option>
-        <ion-select-option value="3">3</ion-select-option>
-        <ion-select-option value="4">4</ion-select-option>
-        <ion-select-option value="5">5</ion-select-option>
-        <ion-select-option value="6">6</ion-select-option>
+        <ion-select-option *ngFor="let i of [1, 2, 3, 4, 5, 6]" [value]="i">{{ i }}</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-list>
 
+  <!-- Información del conductor -->
   <ion-item>
-    <ion-label position="floating">Patente del Vehículo</ion-label>
+    <ion-label position="floating">Patente del Vehículo<ion-text color="danger">*</ion-text></ion-label>
     <ion-input [(ngModel)]="patente" placeholder="ABC123" required></ion-input>
   </ion-item>
 
   <ion-item>
-    <ion-label position="floating">Nombre del Conductor</ion-label>
+    <ion-label position="floating">Nombre del Conductor<ion-text color="danger">*</ion-text></ion-label>
     <ion-input [(ngModel)]="nombreConductor" placeholder="Tu Nombre" required></ion-input>
   </ion-item>
 
   <ion-item>
-    <ion-label position="floating">Número de Contacto</ion-label>
-    <ion-input [(ngModel)]="numeroContacto" placeholder="+56912345678" required></ion-input>
+    <ion-label position="floating">Número de Contacto<ion-text color="danger">*</ion-text></ion-label>
+    <ion-input type="tel" [(ngModel)]="numeroContacto" placeholder="+56912345678" required></ion-input>
   </ion-item>
 
+  <!-- Mapa interactivo para seleccionar destino -->
   <div id="map" style="height: 300px;"></div>
 
+  <!-- Mostrar el destino seleccionado si existe -->
   <div *ngIf="destinationName" class="destination">
-    <ion-label>Destino: {{ destinationName }}</ion-label>
+    <ion-label><strong>Destino:</strong> {{ destinationName }}</ion-label>
   </div>
 
-
+  <!-- Precio del viaje -->
   <ion-item>
-    <ion-label>Precio:</ion-label>
-    <ion-input type="number" [(ngModel)]="precio" placeholder="0"></ion-input>
+    <ion-label>Precio:<ion-text color="danger">*</ion-text></ion-label>
+    <ion-input type="number" [(ngModel)]="precio" placeholder="0" required></ion-input>
   </ion-item>
 
+  <!-- Botón para programar el viaje -->
+  <ion-button (click)="programarViaje()" shape="round" expand="block" [disabled]="!isFormValid()">
+    Siguiente
+  </ion-button>
 
-  <ion-button (click)="programarViaje()" shape="round" expand="block">Siguiente</ion-button>
-
-
-  <ion-button routerLink="/choferben" color="tertiary" shape="round" expand="block">Volver</ion-button>
-
+  <!-- Botón para volver al menú anterior -->
+  <ion-button routerLink="/choferben" color="tertiary" shape="round" expand="block">
+    Volver
+  </ion-button>
 </ion-content>

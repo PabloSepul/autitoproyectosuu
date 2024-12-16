@@ -11,22 +11,35 @@
     <h4>Resumen de tu viaje</h4>
   </div>
 
-  <ion-card>
+  <!-- Mostrar detalles del viaje si existen -->
+  <ion-card *ngIf="viaje; else noViaje">
     <ion-card-header>
       <ion-card-title>Detalles del Viaje</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <p><strong>Origen:</strong> {{ travelData?.origen }}</p>
-      <p><strong>Destino:</strong> {{ travelData?.destino }}</p>
-      <p><strong>Asientos:</strong> {{ travelData?.asientos }}</p>
-      <p><strong>Precio:</strong> ${{ travelData?.precio }}</p>
+      <p><strong>Origen:</strong> {{ viaje.origen }}</p>
+      <p><strong>Destino:</strong> {{ viaje.destino }}</p>
+      <p><strong>Asientos:</strong> {{ viaje.asientos }}</p>
+      <p><strong>Precio:</strong> ${{ viaje.precio }}</p>
+      <p><strong>Patente del Vehículo:</strong> {{ viaje.patente }}</p>
+      <p><strong>Nombre del Conductor:</strong> {{ viaje.nombreConductor }}</p>
+      <p><strong>Número de Contacto:</strong> {{ viaje.numeroContacto }}</p>
     </ion-card-content>
   </ion-card>
 
-  <ion-button routerLink="/choferprogviaje" shape="round" expand="full">Editar</ion-button>
-  <ion-button routerLink="/chofespera" shape="round" expand="full">Confirmar</ion-button>
+  <!-- Botones de acción -->
+  <ion-button routerLink="/choferprogviaje" shape="round" expand="full" color="secondary">
+    Editar
+  </ion-button>
+  <ion-button routerLink="/chofespera" shape="round" expand="full" color="primary">
+    Confirmar
+  </ion-button>
 
-  <ion-toolbar>
-    <ion-title size="large"></ion-title>
-  </ion-toolbar>
+  <!-- Mensaje cuando no hay viaje -->
+  <ng-template #noViaje>
+    <div class="ion-text-center">
+      <h2>No se encontraron datos del viaje</h2>
+      <p>Por favor, crea un viaje desde la página de programación.</p>
+    </div>
+  </ng-template>
 </ion-content>
